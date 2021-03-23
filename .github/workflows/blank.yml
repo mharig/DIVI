@@ -1,36 +1,36 @@
-# This is a basic workflow to help you get started with Actions
+name: Scrape latest data
 
-name: CI
-
-# Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+  schedule:
+    - cron:  '7 17 * * *'
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  scheduled:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+    - name: Check out this repo
+      uses: actions/checkout@v2
+    - name: Setup Python environment
+      uses: actions/setup-python@v2
+    - name: Fetch latest DIVI data
+      uses: mharig/run-python-script-action@v1
+      with:
+          script: |
+            import requests
+            import time
+            t = time.localtime()
+            filename = f'https://www.divi.de/divi-intensivregister-tagesreport-archiv-csv/viewdocument/5549/divi-intensivregister-{t.tm_year}-{t.tm_month}-{t.tm_day}-12-15'
+            data = requests.get(filename).text
+            with open('DIVI.csv', 'ta') as f:
+                f.write(data+'\n')
+        
+    - name: Commit and push if it changed
+      run: |-
+        git config user.name "Automated"
+        git config user.email "actions@users.noreply.github.com"
+        git add -A
+        timestamp=$(date -u)
+        git commit -m "Latest data: ${timestamp}" || exit 0
+        git push
