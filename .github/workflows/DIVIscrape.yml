@@ -4,7 +4,7 @@ on:
   push:
   workflow_dispatch:
   schedule:
-    - cron:  '7 17 * * *'
+    - cron:  '7 14 * * *'
 
 jobs:
   scheduled:
@@ -16,7 +16,6 @@ jobs:
       uses: actions/setup-python@v2
     - name: Fetch latest DIVI data
       run: |-
-        mkdir -p data
         python ./scrapeDIVI.py 
         
     - name: Commit and push if it changed
