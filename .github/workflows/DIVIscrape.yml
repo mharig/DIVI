@@ -17,7 +17,7 @@ jobs:
     - name: Fetch latest DIVI data
       run: |-
         mkdir -p data
-        python3 scrapeDIVI.py 
+        python ./scrapeDIVI.py 
         
     - name: Commit and push if it changed
       run: |-
