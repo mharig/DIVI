@@ -5,5 +5,7 @@ url = f'https://www.divi.de/joomlatools-files/docman-files/divi-intensivregister
 print(f'Fetching: {url}') 
 r = urlopen(url)
 data = r.read().decode()
+# remove first line (header)
+data2 = data[data.find('\n')+1:]
 with open('DIVI.csv', 'ta') as f:
-    f.write(data+'\n')
+    f.write(data2+'\n')
